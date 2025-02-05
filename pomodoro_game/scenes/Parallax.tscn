@@ -1,13 +1,16 @@
-[gd_scene load_steps=6 format=3 uid="uid://5bkdtbngqrtj"]
+[gd_scene load_steps=8 format=3 uid="uid://5bkdtbngqrtj"]
 
-[ext_resource type="Texture2D" uid="uid://djwifniclexrp" path="res://assets/images/cloudsPurple.png" id="1_qmnk3"]
+[ext_resource type="Texture2D" uid="uid://dp0ug5pq0ktfo" path="res://assets/images/bg_red.png" id="1_q76ol"]
+[ext_resource type="Texture2D" uid="uid://r17bl6im7nih" path="res://assets/images/clouds.png" id="2_6kliv"]
+[ext_resource type="Texture2D" uid="uid://bgbblgkhrjq0i" path="res://assets/images/city_back_red.png" id="2_c2ar7"]
 [ext_resource type="Script" path="res://scripts/scroll_controller.gd" id="2_g7xhf"]
-[ext_resource type="Texture2D" uid="uid://dqow3s0m4tt5j" path="res://assets/images/backgroundGray.png" id="2_lewje"]
-[ext_resource type="Texture2D" uid="uid://dyxdntfb70yn" path="res://assets/images/midHalfSize.png" id="3_hnw77"]
-[ext_resource type="Texture2D" uid="uid://bk2t7c7y2y8hu" path="res://assets/images/frontSmall.png" id="4_nmq1p"]
+[ext_resource type="Texture2D" uid="uid://v1r4aiq37dw" path="res://assets/images/city_mid_red.png" id="3_5cnvf"]
+[ext_resource type="Texture2D" uid="uid://cdh61hmfb0p26" path="res://assets/images/clouds-infront.png" id="4_43qys"]
+[ext_resource type="Texture2D" uid="uid://dc06clqkgn408" path="res://assets/images/city_red_small.png" id="4_fafg8"]
 
 [node name="Parallax" type="Node2D"]
 metadata/_edit_horizontal_guides_ = [722.0]
+metadata/_edit_vertical_guides_ = [-4487.0]
 
 [node name="MyParallax" type="Node2D" parent="."]
 position = Vector2(640, 360)
@@ -20,37 +23,57 @@ repeat_times = 3
 
 [node name="Background" type="Sprite2D" parent="MyParallax/Sky"]
 texture_filter = 1
-texture = ExtResource("1_qmnk3")
+texture = ExtResource("1_q76ol")
+
+[node name="Cloud-Behind" type="Parallax2D" parent="MyParallax"]
+texture_filter = 1
+scroll_scale = Vector2(0.12, 0)
+repeat_size = Vector2(10240, 0)
+repeat_times = 3
+
+[node name="Cloud" type="Sprite2D" parent="MyParallax/Cloud-Behind"]
+texture_filter = 1
+texture = ExtResource("2_6kliv")
 
 [node name="Back" type="Parallax2D" parent="MyParallax"]
 texture_filter = 1
-scroll_scale = Vector2(0.2, 0)
-repeat_size = Vector2(6400, 0)
+scroll_scale = Vector2(0.3, 0)
+repeat_size = Vector2(10240, 0)
 repeat_times = 3
 
 [node name="City" type="Sprite2D" parent="MyParallax/Back"]
 texture_filter = 1
-texture = ExtResource("2_lewje")
+texture = ExtResource("2_c2ar7")
+
+[node name="Cloud-In-Front" type="Parallax2D" parent="MyParallax"]
+texture_filter = 1
+scroll_scale = Vector2(0.12, 0)
+repeat_size = Vector2(10240, 0)
+repeat_times = 3
+
+[node name="Cloud" type="Sprite2D" parent="MyParallax/Cloud-In-Front"]
+texture_filter = 1
+texture = ExtResource("4_43qys")
 
 [node name="Middle" type="Parallax2D" parent="MyParallax"]
 texture_filter = 1
-scroll_scale = Vector2(0.5, 0)
-repeat_size = Vector2(6400, 0)
+scroll_scale = Vector2(0.4, 0)
+repeat_size = Vector2(10240, 0)
 repeat_times = 3
 
 [node name="City" type="Sprite2D" parent="MyParallax/Middle"]
 texture_filter = 1
-texture = ExtResource("3_hnw77")
+texture = ExtResource("3_5cnvf")
 
 [node name="Front" type="Parallax2D" parent="MyParallax"]
 texture_filter = 1
-scroll_scale = Vector2(1, 0)
-repeat_size = Vector2(6400, 0)
+scroll_scale = Vector2(0.5, 0)
+repeat_size = Vector2(10240, 0)
 repeat_times = 3
 
 [node name="City" type="Sprite2D" parent="MyParallax/Front"]
 texture_filter = 1
-texture = ExtResource("4_nmq1p")
+texture = ExtResource("4_fafg8")
 
 [node name="ScrollController" type="Node2D" parent="."]
 position = Vector2(-165, -108)
