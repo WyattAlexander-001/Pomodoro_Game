@@ -1,0 +1,50 @@
+[gd_scene load_steps=4 format=3 uid="uid://bciqia3w0x22j"]
+
+[ext_resource type="Texture2D" path="res://assets/seamless_space_backgrounds_-_large_1024x1024/Large 1024x1024/Blue Nebula/Blue Nebula 5 - 1024x1024.png" id="1_1a1h3"]
+[ext_resource type="Texture2D" uid="uid://bi4mmw8runfya" path="res://icon.svg" id="2_tuhpp"]
+[ext_resource type="Script" path="res://scripts/vertical_controller.gd" id="7_3klho"]
+
+[node name="ParrallaxVertical" type="Node2D"]
+
+[node name="MyParallax" type="Node2D" parent="."]
+position = Vector2(640, 360)
+
+[node name="Space" type="Parallax2D" parent="MyParallax"]
+texture_filter = 1
+scale = Vector2(2, 2)
+scroll_scale = Vector2(0, 0.1)
+repeat_size = Vector2(0, 1024)
+repeat_times = 3
+
+[node name="Background" type="Sprite2D" parent="MyParallax/Space"]
+texture_filter = 1
+texture = ExtResource("1_1a1h3")
+
+[node name="Left-Head" type="Parallax2D" parent="MyParallax"]
+texture_filter = 1
+scroll_scale = Vector2(0, 1)
+repeat_size = Vector2(0, 1024)
+repeat_times = 3
+
+[node name="Background" type="Sprite2D" parent="MyParallax/Left-Head"]
+texture_filter = 1
+texture = ExtResource("2_tuhpp")
+
+[node name="Right-Head" type="Parallax2D" parent="MyParallax"]
+texture_filter = 1
+scroll_scale = Vector2(0, 5)
+scroll_offset = Vector2(150, 0)
+repeat_size = Vector2(0, 1024)
+repeat_times = 3
+
+[node name="Background" type="Sprite2D" parent="MyParallax/Right-Head"]
+texture_filter = 1
+texture = ExtResource("2_tuhpp")
+
+[node name="ScrollController" type="Node2D" parent="."]
+visible = false
+position = Vector2(-165, -108)
+script = ExtResource("7_3klho")
+
+[node name="Camera2D" type="Camera2D" parent="ScrollController"]
+position_smoothing_enabled = true

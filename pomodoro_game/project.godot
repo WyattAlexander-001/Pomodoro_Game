@@ -16,6 +16,10 @@ config/features=PackedStringArray("4.3", "Forward Plus")
 boot_splash/bg_color=Color(0.659362, 0.168966, 0.547394, 1)
 config/icon="res://icon.svg"
 
+[autoload]
+
+SoundEffectManager="*res://scenes/sound_effect_manager.tscn"
+
 [display]
 
 window/size/viewport_width=1280

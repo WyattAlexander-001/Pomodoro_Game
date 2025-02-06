@@ -47,7 +47,7 @@ texture = ExtResource("2_c2ar7")
 
 [node name="Cloud-In-Front" type="Parallax2D" parent="MyParallax"]
 texture_filter = 1
-scroll_scale = Vector2(0.12, 0)
+scroll_scale = Vector2(0.01, 0)
 repeat_size = Vector2(10240, 0)
 repeat_times = 3
 
