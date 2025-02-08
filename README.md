@@ -17,6 +17,8 @@ UI is underway and it's not pretty, but it's not ugly either!
 
 I also implemented an audio manager singleton so I can have a central place for sound effects instead of having to clutter up my workspace with nodes. I can extend it for music too.
 
+![Progess](git_images/progress.PNG)
+
 ## Tech Stack:
 ```bash
 Just Godot 4.3 Stable...
