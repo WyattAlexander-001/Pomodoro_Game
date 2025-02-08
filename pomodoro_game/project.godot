@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 [autoload]
 
 SoundEffectManager="*res://scenes/sound_effect_manager.tscn"
+SaveDataForPlayer="*res://scripts/SaveDataForPlayer.gd"
 
 [display]
 

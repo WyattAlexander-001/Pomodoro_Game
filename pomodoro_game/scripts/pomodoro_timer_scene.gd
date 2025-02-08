@@ -1,146 +1,158 @@
 extends Control
 
+@onready var pomodoro_count_label: Label = $VBoxContainer/VBoxContainer/PomodoroCountLabel
+@onready var total_studied_label: Label = $VBoxContainer/VBoxContainer/TotalStudiedLabel
+
 @onready var work_time_spinbox = $VBoxContainer/WorkTimeContainer/WorkTimeSpinBox
 @onready var rest_time_spinbox = $VBoxContainer/RestTimeContainer/RestTimeSpinBox
-@onready var timer_label       = $VBoxContainer/TimerLabel
-@onready var start_button      = $VBoxContainer/ButtonsContainer/StartButton
-@onready var pause_button      = $VBoxContainer/ButtonsContainer/PauseButton
-@onready var sound_player      = $VBoxContainer/SoundEffectPlayer
-@onready var mood_option       = $VBoxContainer/MoodContainer/MoodOption
-@onready var diary_entry       = $VBoxContainer/DiaryEntry
-@onready var save_button: Button = $VBoxContainer/HBoxContainer/SaveButton
-@onready var save_to_json_button: Button = $VBoxContainer/HBoxContainer/SaveToJSONButton
-@onready var reset_button: Button = $VBoxContainer/ButtonsContainer/ResetButton
-@onready var load_from_json_button: Button = $VBoxContainer/HBoxContainer/LoadFromJSONButton
+@onready var timer_label: Label = $VBoxContainer/TimerContainer/TimerLabel
+@onready var start_button       = $VBoxContainer/ButtonsContainer/StartButton
+@onready var pause_button       = $VBoxContainer/ButtonsContainer/PauseButton
+@onready var mood_option        = $VBoxContainer/MoodContainer/MoodOption
+@onready var diary_entry        = $VBoxContainer/DiaryEntry
+@onready var reset_button       = $VBoxContainer/TimerContainer/ResetButton
 @onready var exit_button: Button = $VBoxContainer/HBoxContainer/ExitButton
+@onready var save_button: Button = $VBoxContainer/HBoxContainer/SaveButton
 
-# Track whether we're in "work" or "rest" mode
-var current_mode = "work"
-
-# Default durations in seconds
-var default_work_duration = 25 * 60
-var default_rest_duration = 5 * 60
-
-# Time left in the current countdown
-var remaining_time = 0.0
-
-# Keeps track of how many total seconds of work have been completed
-var total_time_studied = 0
-
-# For pausing
 var paused = false
-var pause_count = 0
 
 func _ready():
-	# Set default SpinBox values
-	work_time_spinbox.value = 25
-	rest_time_spinbox.value = 5
-
-	# Update label
-	update_timer_label()
+	var sg = SaveDataForPlayer.save_game
+	# Use the loaded data to set up spin boxes, labels, etc.
+	work_time_spinbox.value = sg.default_work_minutes
+	rest_time_spinbox.value = sg.default_rest_minutes
+	update_timer_label(sg.remaining_time)
+	update_pomodoro_count_label()
+	# Possibly set mood OptionButton, diary text, etc.
 
 func _process(delta: float) -> void:
-	# Update timer logic in a separate function
-	if not paused and remaining_time > 0:
-		_update_timer_loop(delta)
-
-func _update_timer_loop(delta: float) -> void:
-	# Decrement the timer
-	remaining_time -= delta
+	var sg = SaveDataForPlayer.save_game
 	
-	# If the timer just ran out, handle transitions and sound
-	if remaining_time <= 0:
-		remaining_time = 0
+	# Only decrement if not paused and there's time left
+	if not paused and sg.remaining_time > 0:
+		sg.remaining_time -= delta
 		
-		# Check which mode just ended
-		if current_mode == "work":
-			# Play end-of-work sound
-			SoundEffectManager.play_sound_effect(SoundEffectManager.SFX_END_WORK)
-			# Add to total studied
-			total_time_studied += int(work_time_spinbox.value * 60)
-			# Switch to rest
-			current_mode = "rest"
-			remaining_time = int(rest_time_spinbox.value * 60)
-		else:
-			# Rest just ended
-			SoundEffectManager.play_sound_effect(SoundEffectManager.SFX_END_REST)
-			# Switch to work but let user start manually
-			current_mode = "work"
+		# Check if time has run out
+		if sg.remaining_time <= 0:
+			sg.remaining_time = 0
+			
+			# If the current mode was "work", that means we just finished a Pomodoro
+			if sg.current_mode == "work":
+				SoundEffectManager.play_sound_effect(SoundEffectManager.SFX_END_WORK)
+				sg.total_time_pomodoros_completed += 1
+				update_pomodoro_count_label()
+				
+				# Log the end of a work session
+				prints("=== Work session finished ===")
+				prints("Pomodoros completed so far: ", sg.total_time_pomodoros_completed)
+				
+				# Add the total studied time in seconds
+				sg.total_time_studied += int(work_time_spinbox.value * 60)
+				prints("Total time studied (seconds) so far: ", sg.total_time_studied)
+				
+				# Switch to rest
+				sg.current_mode = "rest"
+				sg.remaining_time = int(rest_time_spinbox.value * 60)
+				prints("Switched to rest for %d seconds." % sg.remaining_time)
+				prints("")
 
-	# Update timer label every frame
-	update_timer_label()
+			else:
+				# Current mode was "rest", so we just finished a rest period
+				SoundEffectManager.play_sound_effect(SoundEffectManager.SFX_END_REST)
+				prints("=== Rest session finished ===")
+				prints("Switching to work mode.")
+				prints("")
+				
+				sg.current_mode = "work"
+				# (Optionally set sg.remaining_time if you want automatic next cycle)
+			
+			# After the session ends, write save to persist changes
+			sg.write_savegame()
+	
+	# Update the timer display each frame
+	update_timer_label(sg.remaining_time)
 
-func _on_start_button_pressed() -> void:
+
+func update_pomodoro_count_label():
+	var sg = SaveDataForPlayer.save_game
+	pomodoro_count_label.text = "Pomodoros Completed: %d" % sg.total_time_pomodoros_completed
+	print("Total Poms Done:")
+	print(sg.total_time_pomodoros_completed)
+	print("Total Time Done:")
+	print(sg.total_time_studied)
+	
+
+
+
+func update_timer_label(time_left: float):
+	var minutes = int(time_left / 60)
+	var seconds = int(time_left) % 60
+	timer_label.text = "%02d:%02d" % [minutes, seconds]
+
+func _on_start_button_pressed():
 	SoundEffectManager.play_sound_effect(SoundEffectManager.SFX_KEY_CLICK)
-	# If there's no active countdown, set it based on mode
-	if remaining_time <= 0:
-		if current_mode == "work":
-			remaining_time = int(work_time_spinbox.value * 60)
-		else: # rest mode
-			remaining_time = int(rest_time_spinbox.value * 60)
-
+	var sg = SaveDataForPlayer.save_game
+	if sg.remaining_time <= 0:
+		if sg.current_mode == "work":
+			sg.remaining_time = int(work_time_spinbox.value * 60)
+		else:
+			sg.remaining_time = int(rest_time_spinbox.value * 60)
 	paused = false
 
-func _on_save_to_json_button_pressed() -> void:
-	# Saves current session info to a JSON file in /JSON/
-	SoundEffectManager.play_sound_effect(SoundEffectManager.SFX_SAVE_TO_JSON)
-	save_session_data()
-
-func _on_pause_button_pressed() -> void:
+func _on_pause_button_pressed():
 	SoundEffectManager.play_sound_effect(SoundEffectManager.SFX_PAUSE)
 	paused = !paused
 	if paused:
-		pause_count += 1
+		SaveDataForPlayer.save_game.pause_count += 1
 
-func update_timer_label():
-	# Replace // with / if needed
-	var minutes = int(remaining_time / 60)
-	var seconds = int(remaining_time) % 60
-	timer_label.text = "%02d:%02d" % [minutes, seconds]
-
-
-
-func save_session_data():
-	var now_dict = Time.get_datetime_dict_from_system()
-	var year     = now_dict.year
-	var month    = now_dict.month
-	var day      = now_dict.day
-	var hour     = now_dict.hour
-	var minute   = now_dict.minute
-	var second   = now_dict.second
-
-	var date_str = "%04d-%02d-%02d_%02d-%02d-%02d" % [year, month, day, hour, minute, second]
-
-	# Build a data dictionary
-	var data = {
-		"date": "%04d-%02d-%02d" % [year, month, day],
-		"time": "%02d:%02d:%02d" % [hour, minute, second],
-		"some_extra_key": "Your other info here"
-	}
-
-	var file_path = "res://JSON/%s.json" % date_str
-	var file = FileAccess.open(file_path, FileAccess.WRITE)
-	if file:
-		file.store_string(JSON.stringify(data) + "\n")
-		file.close()
-		prints("Session data saved to:", file_path)
-	else:
-		printerr("Error saving session data.")
-
-
-func _on_reset_button_pressed() -> void:
+func _on_reset_button_pressed():
 	SoundEffectManager.play_sound_effect(SoundEffectManager.SFX_KEY_CLICK)
-	pass # Replace with function body.
 
+	paused = true
+	var sg = SaveDataForPlayer.save_game
+	sg.current_mode = "work"
+	sg.remaining_time = 0
+	sg.default_work_minutes = 25
+	sg.default_rest_minutes = 5
+	sg.total_time_studied = 0
+	sg.pause_count = 0
+	sg.total_time_pomodoros_completed = 0
+	sg.mood = "Happy"
+	sg.diary = ""
 
-func _on_load_from_json_button_pressed() -> void:
-	SoundEffectManager.play_sound_effect(SoundEffectManager.SFX_KEY_CLICK)
-	pass # Replace with function body.
+	work_time_spinbox.value = 25
+	rest_time_spinbox.value = 5
+	mood_option.select(find_text_in_option_button(mood_option, "Happy"))
+	diary_entry.text = ""
+	update_timer_label(0)
 
-func _on_save_button_pressed() -> void:
-	SoundEffectManager.play_sound_effect(SoundEffectManager.SFX_KEY_CLICK)
-	pass # Replace with function body.
+	# Update the label to reset count
+	update_pomodoro_count_label()
+
+	sg.write_savegame()
+
+	sg.write_savegame()
+
+func _on_mood_option_item_selected(index: int):
+	var sg = SaveDataForPlayer.save_game
+	sg.mood = mood_option.get_item_text(index)
+	sg.write_savegame()
+
+func _on_diary_entry_text_changed(new_text: String):
+	var sg = SaveDataForPlayer.save_game
+	sg.diary = new_text
+	sg.write_savegame()
+
+func find_text_in_option_button(option_button: OptionButton, text_to_find: String) -> int:
+	for i in range(option_button.item_count):
+		if option_button.get_item_text(i) == text_to_find:
+			return i
+	return -1
 
 func _on_exit_button_pressed() -> void:
 	SoundEffectManager.play_sound_effect(SoundEffectManager.SFX_KEY_CLICK)
 	get_tree().quit()
+
+func _on_save_button_pressed() -> void:
+	SoundEffectManager.play_sound_effect(SoundEffectManager.SFX_KEY_CLICK)
+	SaveDataForPlayer.save_game.write_savegame()

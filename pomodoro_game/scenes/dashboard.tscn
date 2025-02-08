@@ -1,0 +1,35 @@
+[gd_scene load_steps=3 format=3 uid="uid://bla385b02d4fb"]
+
+[ext_resource type="Theme" uid="uid://bi44xrkt28la2" path="res://assets/theme/first_theme.tres" id="1_m6vmj"]
+[ext_resource type="Script" path="res://scripts/dashboard.gd" id="1_qe8rv"]
+
+[node name="Dashboard" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_m6vmj")
+script = ExtResource("1_qe8rv")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="PomodorosLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "This is a Dashboard"
+
+[node name="StudiedTimeLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "Studied:"
+
+[node name="MoodLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "Mood:"
+
+[node name="DiaryLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "Diary Entry:"

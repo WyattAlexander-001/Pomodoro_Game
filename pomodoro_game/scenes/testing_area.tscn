@@ -1,0 +1,27 @@
+[gd_scene load_steps=4 format=3 uid="uid://dlobbeg4iyjpj"]
+
+[ext_resource type="PackedScene" uid="uid://5bkdtbngqrtj" path="res://scenes/Parallax.tscn" id="1_iscie"]
+[ext_resource type="PackedScene" uid="uid://bla385b02d4fb" path="res://scenes/dashboard.tscn" id="1_qngxl"]
+[ext_resource type="PackedScene" uid="uid://fuerk0yjirwy" path="res://scenes/PomodoroTimerScene.tscn" id="2_lmkhw"]
+
+[node name="TestingArea" type="Node2D"]
+metadata/_edit_vertical_guides_ = [1277.0, -2.0]
+metadata/_edit_horizontal_guides_ = [718.0, 4.0]
+
+[node name="Parallax" parent="." instance=ExtResource("1_iscie")]
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="Dashboard" parent="CanvasLayer" instance=ExtResource("1_qngxl")]
+offset_left = 705.0
+offset_top = 169.0
+offset_right = 705.0
+offset_bottom = 169.0
+metadata/_edit_use_anchors_ = true
+
+[node name="main" parent="CanvasLayer" instance=ExtResource("2_lmkhw")]
+offset_left = 405.0
+offset_top = 302.0
+offset_right = 405.0
+offset_bottom = 302.0
+metadata/_edit_use_anchors_ = true

@@ -20,6 +20,7 @@ corner_radius_bottom_left = 5
 corner_detail = 20
 shadow_size = 1
 shadow_offset = Vector2(-5, 2.5)
+anti_aliasing = false
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_c5be1"]
 border_width_left = 10
@@ -43,4 +44,5 @@ Label/colors/font_color = Color(1, 0.914063, 0, 1)
 Label/colors/font_shadow_color = Color(0, 0, 0, 1)
 Label/constants/shadow_offset_x = -2
 Label/constants/shadow_offset_y = 2
+Label/fonts/font = ExtResource("1_yr05l")
 Label/styles/normal = SubResource("StyleBoxFlat_c5be1")
